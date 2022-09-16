@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, ScrollView, View } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, Alert } from 'react-native';
 import {Navbar} from './components/Navbar';
 import { TodoTitle } from './components/TodoTitle';
 import { TodoList } from './components/TodoList'
@@ -11,6 +11,7 @@ export default function App() {
   const addTodo = (title) => {
     setTodos(prev => [...prev, {
       id: Date.now().toString(),
+      complited: false,
       title
     }])
   }
@@ -19,15 +20,26 @@ export default function App() {
     setTodos(prev=>prev.filter(todo => todo.id !==id))
   }
 
+  const compliteTodo = id => {
+    let mapped = todos.map(todo=> {
+      return todo.id == id ? {...todo, complited: !todo.complited} : {...todo}
+    })
+    setTodos(mapped)
+  }
+
   return (
     <View>
       <Navbar title="TodoApp"/>
       <View style={styles.container}>
         <TodoTitle onSubmit={addTodo}/>
         <ScrollView>
-          { todos.map((todo) => {
-            return <TodoList key={todo.id} todo={todo} style={styles.list} onRemove={deleteTodo}/>
+          { todos.reverse().map((todo) => {
+            return todo.complited ? '' : <TodoList key={todo.id} todo={todo} style={styles.list} onRemove={deleteTodo} onUpdate={compliteTodo}/>
           }) }
+          { todos. reverse().map((todo) => {
+            return todo.complited ? 
+              <TodoList key={todo.id} todo={todo} style={styles.list} onRemove={deleteTodo} onUpdate={compliteTodo}/> :''
+          })}
         </ScrollView>
       </View>
       <StatusBar style="auto" />
